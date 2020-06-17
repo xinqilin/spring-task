@@ -14,3 +14,11 @@
 
 done!
 ```
+
+
+### 使用非同步
+
+``@EnableAsync``
+
+Service
+``@Async``
