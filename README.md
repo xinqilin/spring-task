@@ -1,6 +1,7 @@
 # spring-task
 
 ### use Lombok
+
 ```
 -Xbootclasspath/a:lombok.jar
 -javaagent:lombok.jar
@@ -122,3 +123,129 @@ A cron-like expression, extending the usual UN*X definition to include triggers
 	 * </ul>
 
 ```
+
+
+### spring mail
+
+```xml
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
+```
+
+### properties
+
+```properties
+spring.mail.username=
+spring.mail.password=
+spring.mail.host=
+spring.mail.properties.mail.smtp.ssl.enable=true  (SSL 安全機制)
+
+```
+
+### REF properties
+```properties
+# =================================
+# Mail
+# =================================
+spring.mail.default-encoding=UTF-8
+# Gmail SMTP
+spring.mail.host=smtp.gmail.com
+# TLS , port 587
+spring.mail.port=587
+spring.mail.username=my.account@gmail.com
+spring.mail.password=my.password
+# Other properties
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.properties.mail.smtp.starttls.required=true
+
+```
+
+
+### 透過config設置
+
+```java
+
+@Configuration
+public class MailConfig {
+ @Bean
+ public JavaMailSender getJavaMailSender() {
+     JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+     mailSender.setHost("smtp.gmail.com");
+     mailSender.setPort(587);
+      
+     mailSender.setUsername("my.gmail@gmail.com");
+     mailSender.setPassword("my.password");
+      
+     Properties props = mailSender.getJavaMailProperties();
+     props.put("mail.transport.protocol", "smtp");
+     props.put("mail.smtp.auth", "true");
+     props.put("mail.smtp.starttls.enable", "true");
+     props.put("mail.smtp.starttls.required", "true");
+     props.put("mail.debug", "true");
+      
+     return mailSender;
+ }
+ 
+}
+
+```
+
+
+調用 
+
+```java
+@AutoWired
+JavaMailSenderImpl javaMail;
+
+@Test
+XXXXX
+SimpleMailMessage msg=new SimpleMailMessage();
+
+msg.setSubject("標題");
+msg.setText("內容");
+
+msg.setTo("去哪裡@gmail.com");
+msg.setFrom("從哪裡@gmail.com");
+
+javaMail.send(msg);
+
+
+
+
+```
+
+### 有兩步驟驗證的話:
+
+```
+左側導覽面板上的 [安全性]，按一下底部的 [選取應用程式]，然後選擇您使用的應用程式，或是建立一組應用程式使用用的密碼
+
+選其他 => 自命名 =>產生16位密碼  =>當成正式密碼 丟在properties中
+
+```
+
+### 複雜mail 
+
+```java
+
+MimeMessage mimeMsg=javaMailSender.createMimeMessage();
+MimeMessageHelper helper=new MimeMessageHelper(mimeMsg ,(multipart:)true);
+
+
+helper.setSubject("標題");
+helper.setText("<strong>內容</strong>",(html編譯) true);    (可加html標籤，後面預設是false)
+
+helper.setTo("去哪裡@gmail.com");
+helper.setFrom("從哪裡@gmail.com");
+
+helper.addAttachement("檔名",new File("檔案位置"));
+
+
+javaMail.send(mimeMsg);
+
+```
+
+
